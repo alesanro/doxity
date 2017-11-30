@@ -37,7 +37,7 @@ function compile({ whitelist, contracts, output, target, version }) {
     //   } catch (e) { /* do noithing */ }
     // }
     const { bin, opcodes, abi, devdoc } = contract;
-    const { author, title } = devdoc;
+    const { author, title } = devdoc || {};
     const data = {
       author,
       title,

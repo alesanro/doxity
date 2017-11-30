@@ -8,14 +8,14 @@ export default function (src) {
   // detect if we're in a truffle project
   return new Promise((resolve) => {
     if (fs.existsSync(`${process.env.PWD}/truffle.js`)) {
-      const config = Config.default();
+      const config = Config.detect({ working_directory: process.env.PWD });
       config.resolver = new Resolver(config);
       config.rawData = true;
       compile.all(config, (err, res) => {
         if (err) { throw err; }
         resolve({
           contracts: Object.keys(res).reduce((o, k) => {
-            const { metadata, ...data } = res[k].rawData;
+            const { metadata, ...data } = res[k];
             try {
               const parsed = JSON.parse(metadata);
               const fN = Object.keys(parsed.settings.compilationTarget)[0];
@@ -32,7 +32,7 @@ export default function (src) {
         });
       });
     } else {
-      const exec = `solc --combined-json abi,asm,ast,bin,bin-runtime,clone-bin,devdoc,interface,opcodes,srcmap,srcmap-runtime,userdoc ${src}`;
+      const exec = `solc --combined-json abi,asm,ast,bin,bin-runtime,clone-bin,devdoc,interface,opcodes,srcmap,srcmap-runtime,userdoc,metadata ${src}`;
       const res = JSON.parse(childProcess.execSync(exec));
       resolve({
         contracts: Object.keys(res.contracts).reduce((o, k) => {
@@ -49,6 +49,7 @@ export default function (src) {
               abi: JSON.parse(contract.abi),
               devdoc: JSON.parse(contract.devdoc),
               userdoc: JSON.parse(contract.userdoc),
+              metadata: JSON.parse(contract.metadata),
             },
           };
         }, {}),
