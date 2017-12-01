@@ -12,6 +12,8 @@ import parseAbi from './parse-abi';
 
 function compile({ whitelist, contracts, output, target, version }) {
   // do we need to check for whitelist?
+
+  const outputFolder = output
   const defaultWhitelist = { source: true, bytecode: true, abi: true, methods: true };
   // if (whitelist && Object.keys(whitelist).length > 0) {
   //   defaultWhitelist = whitelist.all || {};
@@ -36,8 +38,11 @@ function compile({ whitelist, contracts, output, target, version }) {
     //     address = instance.all_networks[interaction.network].address;
     //   } catch (e) { /* do noithing */ }
     // }
-    const { bin, opcodes, abi, devdoc } = contract;
-    const { author, title } = devdoc || {};
+    // console.log('[doxity-compile-index] contract info:', contract);
+    const { bin, opcodes, output } = contract;
+    const { devdoc, abi } = output
+    const { author, title } = devdoc;
+    // console.log('[doxity-compile-index] devdoc:', devdoc);
     const data = {
       author,
       title,
@@ -51,7 +56,7 @@ function compile({ whitelist, contracts, output, target, version }) {
       source: myWhitelist.source && fs.readFileSync(fileName).toString(),
       abiDocs: myWhitelist.methods && parseAbi(contract),
     };
-    return fs.writeFileSync(`${output}/${contractName}.json`, `${JSON.stringify(data)}\n`);
+    return fs.writeFileSync(`${outputFolder}/${contractName}.json`, `${JSON.stringify(data)}\n`);
   });
 
   // TODO find in a better way?

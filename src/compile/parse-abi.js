@@ -2,11 +2,13 @@ import { getFunctionSignature } from '../helpers';
 
 export default function (contract) {
   return contract.abi.map((method) => {
+
+      // console.log('[doxity-compile-parse-abi] method:', method);
     // get find relevent docs
     const inputParams = method.inputs || [];
     const signature = method.name && `${method.name}(${inputParams.map(i => i.type).join(',')})`;
-    const devDocs = ((contract.devdoc || {})['methods']  || {})[signature] || {};
-    const userDocs = ((contract.userdoc || {})['methods'] || {})[signature] || {};
+    const devDocs = (contract.output.devdoc.methods || {})[signature] || {};
+    const userDocs = (contract.output.userdoc.methods || {})[signature] || {};
     // map abi inputs to devdoc inputs
     const params = devDocs.params || {};
     const inputs = inputParams.map(param => ({ ...param, description: params[param.name] }));
